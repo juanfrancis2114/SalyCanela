@@ -14,11 +14,28 @@ const mapPedido = (p) => ({
   subtotal: Number(p.ped_subtotal || 0),
   iva: Number(p.ped_iva || 0),
   total: Number(p.ped_total || 0),
+  cobradoEn: p.ped_cobrado_en,
   nombreUsuario: p.ped_nombre_usuario,
   createdAt: p.ped_created_at,
 });
 
-const generarMesa = () => Math.floor(Math.random() * 12) + 1;
+const obtenerNombreUsuario = async (tx, userId) => {
+  const usuario = await tx.usuario.findUnique({
+    where: {
+      usu_id: BigInt(userId),
+    },
+  });
+
+  const data = usuario?.usu_data || {};
+
+  return (
+    data.nombre ||
+    data.name ||
+    usuario?.usu_usuario ||
+    usuario?.usu_email ||
+    `Usuario ${userId}`
+  );
+};
 
 export const PedidoModel = {
   crearDesdeCarrito: async (userId, items) =>
@@ -27,14 +44,14 @@ export const PedidoModel = {
 
       const productos = await tx.menu_items.findMany({
         where: {
-          plat_id: {
-            in: ids,
-          },
+          plat_id: { in: ids },
           plat_activo: true,
         },
       });
 
       const mapa = new Map(productos.map((p) => [Number(p.plat_id), p]));
+
+      const nombreUsuario = await obtenerNombreUsuario(tx, userId);
 
       const itemsPedido = [];
       let totalConIva = 0;
@@ -43,9 +60,10 @@ export const PedidoModel = {
         const prod = mapa.get(Number(item.productoId));
 
         if (!prod) {
-          throw Object.assign(new Error(`Producto ${item.productoId} no existe.`), {
-            statusCode: 400,
-          });
+          throw Object.assign(
+            new Error(`Producto ${item.productoId} no existe.`),
+            { statusCode: 400 }
+          );
         }
 
         const precioUnitario = Number(prod.plat_precio);
@@ -69,7 +87,7 @@ export const PedidoModel = {
         data: {
           ped_estado: 'pendiente',
           ped_id_usuario: String(userId),
-          ped_mesa: generarMesa(),
+          ped_mesa: 1,
           ped_fecha: new Date().toLocaleDateString('es-EC'),
           ped_hora: new Date().toLocaleTimeString('es-EC'),
           ped_rol: 'cliente',
@@ -77,7 +95,8 @@ export const PedidoModel = {
           ped_total: Number(totalConIva.toFixed(2)),
           ped_iva: Number(iva.toFixed(2)),
           ped_subtotal: Number(subtotal.toFixed(2)),
-          ped_nombre_usuario: '',
+          ped_cobrado_en: new Date().toISOString(),
+          ped_nombre_usuario: nombreUsuario,
         },
       });
 
