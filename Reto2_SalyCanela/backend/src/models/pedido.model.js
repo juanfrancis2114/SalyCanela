@@ -21,9 +21,7 @@ const mapPedido = (p) => ({
 
 const obtenerNombreUsuario = async (tx, userId) => {
   const usuario = await tx.usuario.findUnique({
-    where: {
-      usu_id: BigInt(userId),
-    },
+    where: { usu_id: BigInt(userId) },
   });
 
   const data = usuario?.usu_data || {};
@@ -50,7 +48,6 @@ export const PedidoModel = {
       });
 
       const mapa = new Map(productos.map((p) => [Number(p.plat_id), p]));
-
       const nombreUsuario = await obtenerNombreUsuario(tx, userId);
 
       const itemsPedido = [];
@@ -87,7 +84,7 @@ export const PedidoModel = {
         data: {
           ped_estado: 'pendiente',
           ped_id_usuario: String(userId),
-          ped_mesa: 1,
+          ped_mesa: null,
           ped_fecha: new Date().toLocaleDateString('es-EC'),
           ped_hora: new Date().toLocaleTimeString('es-EC'),
           ped_rol: 'cliente',
@@ -95,7 +92,7 @@ export const PedidoModel = {
           ped_total: Number(totalConIva.toFixed(2)),
           ped_iva: Number(iva.toFixed(2)),
           ped_subtotal: Number(subtotal.toFixed(2)),
-          ped_cobrado_en: new Date().toISOString(),
+          ped_cobrado_en: null,
           ped_nombre_usuario: nombreUsuario,
         },
       });
@@ -105,12 +102,8 @@ export const PedidoModel = {
 
   findByUser: async (userId) => {
     const pedidos = await prisma.pedido.findMany({
-      where: {
-        ped_id_usuario: String(userId),
-      },
-      orderBy: {
-        ped_created_at: 'desc',
-      },
+      where: { ped_id_usuario: String(userId) },
+      orderBy: { ped_created_at: 'desc' },
     });
 
     return pedidos.map(mapPedido);
@@ -118,9 +111,7 @@ export const PedidoModel = {
 
   findAll: async () => {
     const pedidos = await prisma.pedido.findMany({
-      orderBy: {
-        ped_created_at: 'desc',
-      },
+      orderBy: { ped_created_at: 'desc' },
     });
 
     return pedidos.map(mapPedido);
