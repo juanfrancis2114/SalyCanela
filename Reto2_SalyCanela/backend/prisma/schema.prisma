@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuario {
+  usu_id         BigInt    @id @default(autoincrement())
+  usu_data       Json
+  usu_usuario    String    @unique(map: "usuarios_usuario_key")
+  usu_email      String    @unique(map: "usuarios_email_key")
+  usu_created_at DateTime? @default(now()) @db.Timestamptz(6)
+  usu_rol_id     Int?
+  roles          roles?    @relation(fields: [usu_rol_id], references: [rol_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("usuarios")
+}
+
+model Producto {
+  prod_id         BigInt     @id
+  prod_stock      Int        @default(20)
+  prod_disponible Boolean    @default(true)
+  prod_updated_at DateTime?  @default(now()) @db.Timestamptz(6)
+  prod_nombre     String?
+  menu_items      menu_items @relation(fields: [prod_id], references: [plat_id], onDelete: Cascade)
+
+  @@map("productos")
+}
+
+model Pedido {
+  ped_id             BigInt    @id @default(autoincrement())
+  ped_estado         String?   @default("pendiente")
+  ped_id_usuario     String?
+  ped_mesa           Int?
+  ped_fecha          String?
+  ped_created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  ped_rol            String?
+  ped_hora           String?
+  ped_items          Json?
+  ped_total          Decimal?  @db.Decimal
+  ped_iva            Decimal?  @db.Decimal
+  ped_subtotal       Decimal?  @db.Decimal
+  ped_cobrado_en     String?
+  ped_nombre_usuario String?
+
+  @@index([ped_estado], map: "idx_pedidos_estado")
+  @@index([ped_mesa], map: "idx_pedidos_mesa")
+  @@map("pedidos")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model gastos {
+  gast_id          BigInt    @id @default(autoincrement())
+  gast_fecha       String?
+  gast_created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  gast_descripcion String?
+  gast_monto       Decimal?  @db.Decimal
+  gast_hora        String?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model mensajes {
+  mens_id         BigInt    @id @default(autoincrement())
+  mens_nombre     String
+  mens_email      String
+  mens_telefono   String?
+  mens_mensaje    String
+  mens_leido      Boolean?  @default(false)
+  mens_enviado_en DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([mens_leido], map: "idx_mensajes_leido")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model menu_items {
+  plat_id           BigInt    @id
+  plat_nombre       String
+  plat_categoria    String
+  plat_descripcion  String?   @default("")
+  plat_precio       Decimal   @db.Decimal(10, 2)
+  plat_ingredientes Json?     @default("[]")
+  plat_tag          String?   @default("")
+  plat_imagen       String?   @default("")
+  plat_destacado    Boolean?  @default(false)
+  plat_activo       Boolean?  @default(true)
+  plat_created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  plat_codigo       String?   @unique
+  productos         Producto?
+}
+
+model roles {
+  rol_id          Int       @id @default(autoincrement())
+  rol_nombre      String    @unique
+  rol_descripcion String?
+  usuarios        Usuario[]
+}
