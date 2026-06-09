@@ -472,3 +472,116 @@ tbody tr:hover { background: var(--cream); }
 .card-foot {
   margin-top: auto;
 }
+
+@media (max-width: 768px) {
+  .navbar,
+  .nav,
+  header nav {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .brand,
+  .logo {
+    font-size: 1.2rem;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .nav-links,
+  .navbar-links {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .nav-links a,
+  .navbar-links a,
+  .nav-links button,
+  .navbar-links button {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+
+  .hero {
+    padding: 50px 20px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+    line-height: 1.1;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .filtros,
+  .tabs,
+  .categorias {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px;
+    white-space: nowrap;
+  }
+
+  .grid,
+  .productos-grid {
+    grid-template-columns: 1fr !important;
+    padding: 0 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .card-img {
+    height: 230px;
+  }
+
+  .card-body {
+    padding: 18px;
+  }
+
+  .card-foot {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .btn,
+  button {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand,
+  .logo {
+    font-size: 1rem;
+    max-width: 120px;
+  }
+
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .card-img {
+    height: 210px;
+  }
+
+  .card-foot {
+    align-items: center;
+  }
+
+  .precio {
+    font-size: 1.6rem;
+  }
+}
