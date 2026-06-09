@@ -18,6 +18,8 @@ const mapPedido = (p) => ({
   createdAt: p.ped_created_at,
 });
 
+const generarMesa = () => Math.floor(Math.random() * 12) + 1;
+
 export const PedidoModel = {
   crearDesdeCarrito: async (userId, items) =>
     prisma.$transaction(async (tx) => {
@@ -67,7 +69,7 @@ export const PedidoModel = {
         data: {
           ped_estado: 'pendiente',
           ped_id_usuario: String(userId),
-          ped_mesa: 1,
+          ped_mesa: generarMesa(),
           ped_fecha: new Date().toLocaleDateString('es-EC'),
           ped_hora: new Date().toLocaleTimeString('es-EC'),
           ped_rol: 'cliente',
